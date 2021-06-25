@@ -3,11 +3,11 @@ package server
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/ash3798/Social-Network/auth"
+	"github.com/ash3798/Social-Network/config"
 	"github.com/ash3798/Social-Network/task"
 )
 
@@ -26,7 +26,6 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	//log.Println(string(data))
 	id, err := task.Action.CreateUser(data)
-	//TODO : might have to send response writer to the functions further to send errors specific to scenario
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -166,12 +165,17 @@ func HandleGetWall(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(string(wall))
+	//log.Println(string(wall))
 	w.Write(wall)
 }
 
 //isAuthorized check if user is authorized or not
 func isAuthorized(w http.ResponseWriter, r *http.Request) bool {
+	if !config.Manager.AuthEnabled {
+		//only for unit testing.  AuthEnable should always be true
+		return true
+	}
+
 	authToken := r.Header.Get("Authorization")
 	if authToken == "" {
 		http.Error(w, "No authorization token provided", http.StatusUnauthorized)

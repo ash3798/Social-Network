@@ -16,6 +16,8 @@ type Config struct {
 	DatabaseName       string `split_words:"true" default:"postgres"`
 	AccessSecret       string `split_words:"true" default:"dummyAccessSecret"`
 	TokenExpireTimeSec int    `split_words:"true" default:"900"`
+
+	AuthEnabled bool //just for unit testing
 }
 
 const (
@@ -44,7 +46,7 @@ func InitEnv() {
 
 //InitReactions will fill the reactionMap using the entries of AllowedReactions
 func InitReactions() {
-	fmt.Printf("Filling map with allowed reactions : %v \n", AllowedReactions)
+	fmt.Printf("Loading allowed reactions : %v \n", AllowedReactions)
 	ReactionMap = make(map[string]int)
 	for idx, reaction := range AllowedReactions {
 		ReactionMap[reaction] = idx
