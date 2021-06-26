@@ -12,7 +12,7 @@ Authentication is done using JWT(JSON WEB-TOKEN). Only the registered users with
 
 ## Getting started
 
-### * Setup the Database for your application
+### Setup the Database for your application
 
 1. Pull the postgres image
 ```shell
@@ -29,7 +29,7 @@ docker run --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=<password> -d po
 > - Hostname will be the IP of your machine ,  Port will same as mentioned in docker run command
 > - Username will be "postgres" if you are using default user.
 
-### * Setup the application
+### Setup the application
 
 1. Clone the repository into your system.
 ```
@@ -60,7 +60,7 @@ docker run --name Social-Network-app -e HOSTNAME=<host-ip> -e DATABASE_PORT=<db-
 
 7. Once container is up and running , application will be accessible on port number used in docker run command.
 
-### * Environment Variables
+### Environment Variables
 * APP_PORT : Used to set port on which application runs
 * HOSTNAME : Used to set the hostname of machine 
 * DATABASE_PORT : Used to set port on which database is accessible
