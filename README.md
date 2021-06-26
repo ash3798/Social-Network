@@ -37,7 +37,7 @@ git clone https://github.com/ash3798/Social-Network.git
 ```
 2. Navigate to Docker folder inside the repository .Here Dockerfile will be there which we will use to create container
 3. Before building the docker file , clone the repository again inside Docker folder , using the same command as above.
-> This workaround is needed to avoid entering the github access token in init.sh file which will be required to clone the repository inside container. So repository will be copied from here while building image .
+> This workaround is needed to avoid entering the github access token in init.sh file which will be required to clone the repository inside container. Here in our case repository will get copied from machine while building image .
 4. After cloning repository in Docker folder , run the docker build command using Dockerfile present.
 ```
 docker build . -t socialnetwork:latest
@@ -53,20 +53,31 @@ socialnetwork   latest    a209a80aa593   7 seconds ago   880MB
 ```
 docker run --name Social-Network-app -e HOSTNAME=<host-ip> -e DATABASE_PORT=<db-port> -e DATABASE_PASSWORD=<password> -p 9999:9999 socialnetwork
 ```
+> - HOSTNAME is the IP of the machine where postgres is running.
 > - Application runs on the port 9999 by default. It can be modified using "APP_PORT" environment variable , but then port also should be changed accordingly in -p argument of docker run command.
 > - Database username and Database name have been set to "postgres" by default in application
 > - If you are using custom user and custom database , you can set username with "DATABASE_USERNAME" and database name with "DATABASE_NAME" environment variables.
 > - Additional environment variables that can be tweaked have been listed below.
 
+```text
+Note :
+if you see error like this on running docker run 
+
+> standard_init_linux.go:228: exec user process caused: no such file or directory
+
+Open init.sh in Notepad++ -> Edit -> EOL Conversions -> select Unix(LF)
+Save the file and build the docker image again
+Docker Run this newly created image now
+```
 7. Once container is up and running , application will be accessible on port number used in docker run command.
 
 ### Environment Variables
 * APP_PORT : Used to set port on which application runs
 * HOSTNAME : Used to set the hostname of machine 
 * DATABASE_PORT : Used to set port on which database is accessible
-* DATABASE_USERNAME : Used to set username of database
+* DATABASE_USERNAME : Used to set username of database. Default : "postgres"
 * DATABASE_PASSWORD : Used to set password of database
-* DATABASE_NAME : Used to set name of database
+* DATABASE_NAME : Used to set name of database. Default : "postgres"
 * ACCESS_SECRET : Used to set secret key to be used in generation of JWT Token
 * TOKEN_EXPIRE_TIME_SEC : Used to set time in seconds after which token will expire. Default : "900"seconds
 
@@ -147,7 +158,7 @@ DELETE  /comment?id=<comment-id>
 ```json
 GET   /wall
 ```
-> response will be in form of array of comments along with the count of reactions made on user's wall
+> Response will be in form of array of comments along with the count of reactions made on user's wall
 ```json
 [
     {
