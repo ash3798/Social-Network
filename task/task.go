@@ -18,6 +18,7 @@ type TASK interface {
 	DeleteCmt(commentID int, username string) error
 	GenerateWall(username string) ([]byte, error)
 	CreateReaction(data []byte) (int, error)
+	CreateSubcomment(username string, data []byte) (int, error)
 }
 
 type task struct{}
@@ -101,6 +102,39 @@ func (t task) CreateComment(username string, data []byte) (int, error) {
 	id, err := database.Action.InsertComment(commentInfo)
 	if err != nil {
 		return 0, errors.New("could not insert comment to database. check receiver_username is valid username.Also check if parent_comment_id is valid if you are doing subcomment")
+	}
+	return id, nil
+}
+
+func (t task) CreateSubcomment(username string, data []byte) (int, error) {
+	commentInfo := structures.CommentInfo{}
+
+	err := json.Unmarshal(data, &commentInfo)
+	if err != nil {
+		log.Println("error while unmarshelling the subcomment info , error :", err.Error())
+		return 0, errors.New("check the structure of payload sent")
+	}
+
+	if commentInfo.ParentCommentID < 1 {
+		return 0, errors.New("Invalid parent_comment_id")
+	}
+	receiverUsername, err := database.Action.GetCommentByID(commentInfo.ParentCommentID)
+	if err != nil {
+		return 0, err
+	}
+
+	commentInfo.SenderUsername = username
+	commentInfo.ReceiverUsername = receiverUsername
+
+	err = validateCommentInfo(commentInfo)
+	if err != nil {
+		return 0, err
+	}
+
+	//log.Printf("comment is : %+v \n", commentInfo)
+	id, err := database.Action.InsertComment(commentInfo)
+	if err != nil {
+		return 0, errors.New("could not add subcomment")
 	}
 	return id, nil
 }

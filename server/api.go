@@ -50,6 +50,11 @@ func getEndpoints() []endpoint {
 		},
 		{
 			method:  post,
+			path:    "/subcomment",
+			handler: HandleCreateSubcomment,
+		},
+		{
+			method:  post,
 			path:    "/reaction",
 			handler: HandleCreateReaction,
 		},

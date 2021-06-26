@@ -91,3 +91,21 @@ func (d database) GetReactionCount(commentID int) (map[string]int, error) {
 
 	return m, nil
 }
+
+func (d database) GetCommentByID(commentID int) (string, error) {
+	userSql := fmt.Sprintf(`select receiver_username from %s where id = $1`, commentTableName)
+
+	receiverUsername := ""
+	err := d.db.QueryRow(userSql, commentID).Scan(&receiverUsername)
+	if err == sql.ErrNoRows {
+		log.Println("error finding the comment with the mentioned commentID , Error :", err.Error())
+		return "", errors.New("could not find the comment with mentioned parent_comment_id")
+	}
+
+	if err != nil {
+		log.Println("error while checking the database. Error :", err.Error())
+		return "", errors.New("error finding the comment with mentioned parent_comment_id")
+	}
+
+	return receiverUsername, nil
+}

@@ -26,6 +26,7 @@ type DATABASE interface {
 	ValidateLoginCreds(loginCreds structures.LoginCred) error
 	GetComments(username string) ([]structures.WallUnit, error)
 	GetReactionCount(commentID int) (map[string]int, error)
+	GetCommentByID(commentID int) (string, error)
 	CloseDBConnection()
 }
 

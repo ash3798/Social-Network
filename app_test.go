@@ -37,6 +37,8 @@ func (m mockDatabase) GetReactionCount(commentID int) (map[string]int, error) {
 }
 func (m mockDatabase) CloseDBConnection() {}
 
+func (m mockDatabase) GetCommentByID(commentID int) (string, error) { return "ashish", nil }
+
 //preconfig does initializations and put mocks before tests
 func preconfig() {
 	config.InitEnv()
@@ -196,7 +198,7 @@ func TestDeleteCommentWithNoQueryParams(t *testing.T) {
 
 	//without id query param
 	recorder := httptest.NewRecorder()
-	req := httptest.NewRequest("DELETE", "/comment?username=ash", bytes.NewBuffer([]byte("")))
+	req := httptest.NewRequest("DELETE", "/comment", bytes.NewBuffer([]byte("")))
 	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleComment(recorder, req)
 	assert.Equal(t, 404, recorder.Code)
@@ -305,9 +307,53 @@ func TestGetWallWithWrongMethod(t *testing.T) {
 	body := []byte(``)
 
 	recorder := httptest.NewRecorder()
-	req := httptest.NewRequest("Post", "/wall", bytes.NewBuffer(body))
+	req := httptest.NewRequest("POST", "/wall", bytes.NewBuffer(body))
 	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleGetWall(recorder, req)
 
 	assert.Equal(t, 405, recorder.Code, recorder.Body)
+}
+
+func TestCreateSubcomment(t *testing.T) {
+	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	body := []byte(`{
+		"comment_text" : "ash subcommented",
+		"parent_comment_id" : 2
+	}`)
+
+	recorder := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/subcomment", bytes.NewBuffer(body))
+	req.Header.Add("Authorization", "Bearer "+token)
+
+	server.HandleCreateSubcomment(recorder, req)
+
+	assert.Equal(t, 200, recorder.Code, recorder.Body)
+
+}
+
+func TestCreateSubcommentWithInvalidID(t *testing.T) {
+	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	body := []byte(`{
+		"comment_text" : "ash subcommented",
+		"parent_comment_id" : 0
+	}`)
+
+	recorder := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/subcomment", bytes.NewBuffer(body))
+	req.Header.Add("Authorization", "Bearer "+token)
+
+	server.HandleCreateSubcomment(recorder, req)
+
+	assert.Equal(t, 400, recorder.Code, recorder.Body)
+
 }

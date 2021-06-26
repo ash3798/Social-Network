@@ -116,6 +116,33 @@ func HandleComment(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Wrong method used. Please use POST or DELETE method", http.StatusMethodNotAllowed)
 }
 
+func HandleCreateSubcomment(w http.ResponseWriter, r *http.Request) {
+	username, ok := isAuthorized(w, r)
+	if !ok {
+		return
+	}
+
+	if r.Method == "POST" {
+		data, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, "Could not read the request body", http.StatusBadRequest)
+			return
+		}
+
+		//log.Println(string(data))
+		id, err := task.Action.CreateSubcomment(username, data)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.Write([]byte("Comment Created with ID : " + strconv.Itoa(id)))
+		return
+	}
+
+	http.Error(w, "Wrong method used. Please use POST method", http.StatusMethodNotAllowed)
+}
+
 //HandleCreateReaction handles the request to create reaction on comment
 func HandleCreateReaction(w http.ResponseWriter, r *http.Request) {
 	_, ok := isAuthorized(w, r)
