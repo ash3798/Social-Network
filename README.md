@@ -141,6 +141,7 @@ Body :  {
 DELETE  /comment?id=<comment-id>
 ```
 > - Id of the comment to be deleted has to be passed as query param in URL itself
+> - Delete is idempotent
 
 7. Generate Wall
 ```json
