@@ -22,8 +22,8 @@ docker pull postgres
 ```shell
 docker run --name postgres-db -p 5432:5432 -e POSTGRES_PASSWORD=<password> -d postgres
 ```
-> - here POSTGRES_PASSWORD is environment variable, this is the password for the "postgres" user created by default
-> - postgres is running on port 5432 inside container, port mapping is done here to allow access from outside the container also.
+> - Here POSTGRES_PASSWORD is environment variable, this is the password for the "postgres" user created by default
+> - Postgres is running on port 5432 inside container, port mapping is done here to allow access from outside the container also.
 
 3. Once container is up and running , you can use database visualizer tool like "DBeaver" to check if postgres is accessible.
 > - Hostname will be the IP of your machine ,  Port will same as mentioned in docker run command
@@ -42,7 +42,7 @@ git clone https://github.com/ash3798/Social-Network.git
 ```
 docker build . -t socialnetwork:latest
 ```
-5. you can check the created image 
+5. You can check the created image 
 ```
 docker images
 
@@ -50,7 +50,7 @@ REPOSITORY      TAG       IMAGE ID       CREATED         SIZE
 socialnetwork   latest    a209a80aa593   7 seconds ago   880MB
 ```
 6. Run the container using the image-id or name .
-```
+```bash
 docker run --name Social-Network-app -e HOSTNAME=<host-ip> -e DATABASE_PORT=<db-port> -e DATABASE_PASSWORD=<password> -p 9999:9999 socialnetwork
 ```
 > - HOSTNAME is the IP of the machine where postgres is running.
@@ -59,17 +59,20 @@ docker run --name Social-Network-app -e HOSTNAME=<host-ip> -e DATABASE_PORT=<db-
 > - If you are using custom user and custom database , you can set username with "DATABASE_USERNAME" and database name with "DATABASE_NAME" environment variables.
 > - Additional environment variables that can be tweaked have been listed below.
 
-```text
-Note :
-if you see error like this on running docker run 
 
-> standard_init_linux.go:228: exec user process caused: no such file or directory
-
-Open init.sh in Notepad++ -> Edit -> EOL Conversions -> select Unix(LF)
-Save the file and build the docker image again
-Docker Run this newly created image now
+#### Note : If you see error like this on running docker run 
 ```
+standard_init_linux.go:228: exec user process caused: no such file or directory
+```
+> - Open init.sh in Notepad++ -> Edit -> EOL Conversions -> select Unix(LF)
+> - Save the file and build the docker image again
+> - Docker Run this newly created image now
+
 7. Once container is up and running , application will be accessible on port number used in docker run command.
+8. Docker logs of container can be used to view the application logs.
+```shell
+docker logs -f Social-Network-app
+```
 
 ### Environment Variables
 * APP_PORT : Used to set port on which application runs
@@ -84,7 +87,7 @@ Docker Run this newly created image now
 ## USAGE TIPS :
 
 ### API available 
-1) Create User
+1) **Create User**
 ```json
 POST   /createuser
 
@@ -95,7 +98,7 @@ Body :   {
          }
 ```
 
-2. Login
+2. **Login**
 ```json
 POST   /login
 
@@ -115,7 +118,7 @@ Body :  {
 {"Authorization" : "Bearer <token>" }
 ```
 
-3. Create Comment
+3. **Create Comment**
 ```json
 POST  /comment
 
@@ -125,7 +128,7 @@ Body :  {
         }
 ```
 
-4. Create Subcomment
+4. **Create Subcomment**
 ```json
 POST  /subcomment
 
@@ -135,7 +138,7 @@ Body :  {
         }
 ```
 
-5. Create reaction
+5. **Create reaction**
 ```json
 POST  /reaction
 
@@ -147,14 +150,14 @@ Body :  {
 > - currently only 3 reactions are supported : **[  like  ,  dislike  ,  +1  ]** . If something else is passed , api will reject it.
 > - Reactions are string type and are case insensitive.
 
-6. Delete comment
+6. **Delete comment**
 ```json
 DELETE  /comment?id=<comment-id>
 ```
 > - Id of the comment to be deleted has to be passed as query param in URL itself
 > - Delete is idempotent
 
-7. Generate Wall
+7. **Generate Wall**
 ```json
 GET   /wall
 ```
