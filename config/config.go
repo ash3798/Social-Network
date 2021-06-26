@@ -8,7 +8,7 @@ import (
 
 type Config struct {
 	AppPort            int    `split_words:"true" default:"9999"`
-	DatabaseHostname   string `split_words:"true" default:"localhost"`
+	Hostname           string `split_words:"true" default:"localhost"`
 	DatabaseUsername   string `split_words:"true" default:"postgres"`
 	DatabasePassword   string `split_words:"true" default:"mysecretpassword"`
 	DatabasePort       int    `split_words:"true" default:"6789"`

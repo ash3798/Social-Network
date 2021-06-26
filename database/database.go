@@ -40,7 +40,7 @@ var (
 
 func InitDatabase() error {
 	database := database{}
-	DB_DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Manager.DatabaseUsername, config.Manager.DatabasePassword, config.Manager.DatabaseHostname, config.Manager.DatabasePort, config.Manager.DatabaseName)
+	DB_DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Manager.DatabaseUsername, config.Manager.DatabasePassword, config.Manager.Hostname, config.Manager.DatabasePort, config.Manager.DatabaseName)
 	log.Println("db dsn :", DB_DSN)
 	//create db connection
 	var err error
