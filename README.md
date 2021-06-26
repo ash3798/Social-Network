@@ -127,8 +127,8 @@ Body :  {
           "receiver_username" : "testusername"
         }
 ```
-> receiver_username is the name of user one whose wall you are creating comment
-> Response of this api call gives back ID of the created comment which can be used for other actions/API calls.
+> - receiver_username is the name of user one whose wall you are creating comment
+> - Response of this api call gives back ID of the created comment which can be used for other actions/API calls.
 
 4. **Create Subcomment**
 ```json
