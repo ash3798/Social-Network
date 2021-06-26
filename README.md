@@ -127,6 +127,8 @@ Body :  {
           "receiver_username" : "testusername"
         }
 ```
+> receiver_username is the name of user one whose wall you are creating comment
+> Response of this api call gives back ID of the created comment which can be used for other actions/API calls.
 
 4. **Create Subcomment**
 ```json
@@ -137,6 +139,7 @@ Body :  {
           "parent_comment_id" : 2
         }
 ```
+> parent_comment_id is the ID of comment on which you are creating subcomment
 
 5. **Create reaction**
 ```json
@@ -147,6 +150,7 @@ Body :  {
           "reaction" : "dislike"
         }
 ```
+> - comment_id is ID of comment on which you wanted to react
 > - currently only 3 reactions are supported : **[  like  ,  dislike  ,  +1  ]** . If something else is passed , api will reject it.
 > - Reactions are string type and are case insensitive.
 
