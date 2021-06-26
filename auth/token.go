@@ -11,7 +11,7 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-type loginResponse struct {
+type LoginResponse struct {
 	Token string `json:"token"`
 }
 
@@ -25,7 +25,7 @@ func CreateToken(userName string) ([]byte, error) {
 		return []byte(""), err
 	}
 
-	response := loginResponse{}
+	response := LoginResponse{}
 	response.Token = token
 
 	res, err := json.Marshal(response)
@@ -44,10 +44,10 @@ func extractToken(authToken string) (string, error) {
 	return "", errors.New("incorrect format of Authorization Token")
 }
 
-func ValidateToken(authToken string) error {
+func ValidateToken(authToken string) (jwt.MapClaims, error) {
 	signedToken, err := extractToken(authToken)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	token, err := jwt.Parse(signedToken, func(token *jwt.Token) (interface{}, error) {
@@ -55,19 +55,19 @@ func ValidateToken(authToken string) error {
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok && !token.Valid {
-		return err
+		return nil, err
 	}
 
 	isValid := claims.VerifyExpiresAt(time.Now().Unix(), true)
 
 	if !isValid {
-		return errors.New("JWT is expired")
+		return nil, errors.New("JWT is expired")
 	}
 
-	return nil
+	return claims, nil
 }

@@ -20,7 +20,7 @@ func (d database) InsertUser(userInfo structures.User) (int, error) {
 		return 0, err
 	}
 
-	fmt.Printf("user record inserted to database successfully. ID: %d", lastInsertId)
+	log.Printf("user record inserted to database successfully. ID: %d", lastInsertId)
 	return lastInsertId, nil
 }
 
@@ -44,7 +44,7 @@ func (d database) InsertComment(commentInfo structures.CommentInfo) (int, error)
 		return 0, err
 	}
 
-	fmt.Printf("comment inserted to database successfully. ID: %d", lastInsertId)
+	log.Printf("comment inserted to database successfully. ID: %d", lastInsertId)
 	return lastInsertId, nil
 }
 
@@ -59,7 +59,7 @@ func (d database) InsertReaction(reactionInfo structures.ReactionInfo) (int, err
 		return 0, err
 	}
 
-	fmt.Printf("reaction inserted to database successfully. ID: %d", lastInsertId)
+	log.Printf("reaction inserted to database successfully. ID: %d", lastInsertId)
 	return lastInsertId, nil
 }
 

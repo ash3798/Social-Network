@@ -25,7 +25,7 @@ func StartServer() {
 		Handler: mux,
 	}
 
-	fmt.Printf("Starting http server at localhost%s \n", addr)
+	log.Printf("Starting http server at localhost%s \n", addr)
 	err := server.ListenAndServe()
 	if err != nil {
 		log.Println("HTTP server stopped . Error : ", err.Error())

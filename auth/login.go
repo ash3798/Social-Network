@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/ash3798/Social-Network/database"
@@ -26,8 +25,6 @@ func CheckLoginCreds(data []byte) (string, error) {
 
 	err = database.Action.ValidateLoginCreds(loginCred)
 	if err == nil {
-		fmt.Printf("login successful for user '%s'", loginCred.Username)
-		//TODO : Add the jwt token mechanism here
 		return loginCred.Username, nil
 	}
 	return "", err

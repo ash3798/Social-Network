@@ -3,9 +3,12 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ash3798/Social-Network/auth"
 	"github.com/ash3798/Social-Network/config"
 	"github.com/ash3798/Social-Network/database"
 	"github.com/ash3798/Social-Network/server"
@@ -41,6 +44,24 @@ func preconfig() {
 	config.Manager.AuthEnabled = false
 
 	database.Action = mockDatabase{}
+}
+
+func generateToken() (string, error) {
+	username := "ashish"
+	config.InitEnv()
+
+	res, err := auth.CreateToken(username)
+	if err != nil {
+		return "", errors.New("error while generating token")
+	}
+
+	loginRes := auth.LoginResponse{}
+	err = json.Unmarshal(res, &loginRes)
+	if err != nil {
+		return "", errors.New("error while unmarshelling response of create Token, Error : " + err.Error())
+	}
+
+	return loginRes.Token, nil
 }
 
 func TestCreateUser(t *testing.T) {
@@ -92,6 +113,11 @@ func TestCreateUserInvalidPayload(t *testing.T) {
 
 func TestComment(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	body := []byte(`{
 		"comment_text" : "retest comment 1",
 		"parent_comment_id" : 0,
@@ -101,14 +127,19 @@ func TestComment(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/comment", bytes.NewBuffer(body))
-
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleComment(recorder, req)
 
-	assert.Equal(t, 200, recorder.Code)
+	assert.Equal(t, 200, recorder.Code, recorder.Body)
 }
 
 func TestCommentWrongMethod(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	body := []byte(`{
 		"comment_text" : "retest comment 1",
 		"parent_comment_id" : 0,
@@ -118,7 +149,7 @@ func TestCommentWrongMethod(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/comment", bytes.NewBuffer(body))
-
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleComment(recorder, req)
 
 	assert.Equal(t, 405, recorder.Code, "status is expected to 405 (MethodNotAllowed)")
@@ -126,11 +157,16 @@ func TestCommentWrongMethod(t *testing.T) {
 
 func TestCommentInvalidPayload(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	body := []byte(`{`)
 
 	recorder := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/createuser", bytes.NewBuffer(body))
-
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleCreateUser(recorder, req)
 
 	assert.Equal(t, 400, recorder.Code)
@@ -138,10 +174,14 @@ func TestCommentInvalidPayload(t *testing.T) {
 
 func TestDeleteComment(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	recorder := httptest.NewRecorder()
-	req := httptest.NewRequest("DELETE", "/comment?id=1&username=ash", bytes.NewBuffer([]byte("")))
-
+	req := httptest.NewRequest("DELETE", "/comment?id=1", bytes.NewBuffer([]byte("")))
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleComment(recorder, req)
 
 	assert.Equal(t, 200, recorder.Code)
@@ -149,24 +189,27 @@ func TestDeleteComment(t *testing.T) {
 
 func TestDeleteCommentWithNoQueryParams(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	//without id query param
 	recorder := httptest.NewRecorder()
 	req := httptest.NewRequest("DELETE", "/comment?username=ash", bytes.NewBuffer([]byte("")))
-
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleComment(recorder, req)
 	assert.Equal(t, 404, recorder.Code)
 
-	//without
-	recorder = httptest.NewRecorder()
-	req = httptest.NewRequest("DELETE", "/comment?id=1", bytes.NewBuffer([]byte("")))
-
-	server.HandleComment(recorder, req)
-	assert.Equal(t, 400, recorder.Code)
 }
 
 func TestCreateReaction(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	body := []byte(`{
 		"comment_id" : 8,
 		"reaction" : "dislike"
@@ -174,7 +217,7 @@ func TestCreateReaction(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/reaction", bytes.NewBuffer(body))
-
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleCreateReaction(recorder, req)
 
 	assert.Equal(t, 200, recorder.Code, recorder.Body)
@@ -182,6 +225,11 @@ func TestCreateReaction(t *testing.T) {
 
 func TestCreateReactionWrongMethod(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	body := []byte(`{
 		"comment_id" : 8,
 		"reaction" : "dislike"
@@ -189,7 +237,7 @@ func TestCreateReactionWrongMethod(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/reaction", bytes.NewBuffer(body))
-
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleCreateReaction(recorder, req)
 	assert.Equal(t, 405, recorder.Code, recorder.Body)
 }
@@ -197,10 +245,14 @@ func TestCreateReactionWrongMethod(t *testing.T) {
 func TestCreateReactionInvalidPayload(t *testing.T) {
 	preconfig()
 	body := []byte(`{`)
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
 
 	recorder := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/reaction", bytes.NewBuffer(body))
-
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleCreateReaction(recorder, req)
 
 	assert.Equal(t, 400, recorder.Code)
@@ -208,6 +260,11 @@ func TestCreateReactionInvalidPayload(t *testing.T) {
 
 func TestCreateReactionInvalidReaction(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	body := []byte(`{
 		"comment_id" : 8,
 		"reaction" : "invalid"
@@ -215,7 +272,7 @@ func TestCreateReactionInvalidReaction(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/reaction", bytes.NewBuffer(body))
-
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleCreateReaction(recorder, req)
 
 	assert.Equal(t, 400, recorder.Code, recorder.Body)
@@ -223,41 +280,33 @@ func TestCreateReactionInvalidReaction(t *testing.T) {
 
 func TestGetWall(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	body := []byte(``)
 
 	recorder := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/wall?username=ash", bytes.NewBuffer(body))
-
+	req := httptest.NewRequest("GET", "/wall", bytes.NewBuffer(body))
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleGetWall(recorder, req)
 
 	assert.Equal(t, 200, recorder.Code, recorder.Body)
 }
 
-func TestGetWallWithNoUsername(t *testing.T) {
-	preconfig()
-	body := []byte(``)
-
-	recorder := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/wall", bytes.NewBuffer(body))
-
-	server.HandleGetWall(recorder, req)
-	assert.Equal(t, 400, recorder.Code, recorder.Body)
-
-	//test case for username bigger than 50 chars
-	recorder = httptest.NewRecorder()
-	req = httptest.NewRequest("GET", "/wall?username=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", bytes.NewBuffer(body))
-
-	server.HandleGetWall(recorder, req)
-	assert.Equal(t, 400, recorder.Code, recorder.Body)
-}
-
 func TestGetWallWithWrongMethod(t *testing.T) {
 	preconfig()
+	token, err := generateToken()
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
 	body := []byte(``)
 
 	recorder := httptest.NewRecorder()
-	req := httptest.NewRequest("Post", "/wall?username=ash", bytes.NewBuffer(body))
-
+	req := httptest.NewRequest("Post", "/wall", bytes.NewBuffer(body))
+	req.Header.Add("Authorization", "Bearer "+token)
 	server.HandleGetWall(recorder, req)
 
 	assert.Equal(t, 405, recorder.Code, recorder.Body)

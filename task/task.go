@@ -14,7 +14,7 @@ import (
 
 type TASK interface {
 	CreateUser(data []byte) (int, error)
-	CreateComment(data []byte) (int, error)
+	CreateComment(username string, data []byte) (int, error)
 	DeleteCmt(commentID int, username string) error
 	GenerateWall(username string) ([]byte, error)
 	CreateReaction(data []byte) (int, error)
@@ -49,7 +49,7 @@ func (t task) CreateUser(data []byte) (int, error) {
 
 	err := json.Unmarshal(data, &user)
 	if err != nil {
-		fmt.Printf("Error while unmarshelling the user structure. Error : %s", err.Error())
+		log.Printf("Error while unmarshelling the user structure. Error : %s", err.Error())
 		return 0, errors.New("could not create user. Make sure that structure of json info is correct")
 	}
 
@@ -58,7 +58,7 @@ func (t task) CreateUser(data []byte) (int, error) {
 		return 0, err
 	}
 
-	//fmt.Printf("user :  %+v \n", user)
+	//log.Printf("user :  %+v \n", user)
 	id, err := database.Action.InsertUser(user)
 	if err != nil {
 		return 0, errors.New("user not created .could not insert user to database")
@@ -82,21 +82,22 @@ func validateCommentInfo(commentInfo structures.CommentInfo) error {
 }
 
 //CreateComment creates the comment according to comment info received
-func (t task) CreateComment(data []byte) (int, error) {
+func (t task) CreateComment(username string, data []byte) (int, error) {
 	commentInfo := structures.CommentInfo{}
 
 	err := json.Unmarshal(data, &commentInfo)
 	if err != nil {
-		fmt.Printf("Error while unmarshalling the comment . Error : %s", err.Error())
+		log.Printf("Error while unmarshalling the comment . Error : %s", err.Error())
 		return 0, errors.New("could not add comment. Make sure structure of the json provided is correct")
 	}
 
+	commentInfo.SenderUsername = username
 	err = validateCommentInfo(commentInfo)
 	if err != nil {
 		return 0, err
 	}
 
-	//fmt.Printf("comment is : %+v \n", commentInfo)
+	//log.Printf("comment is : %+v \n", commentInfo)
 	id, err := database.Action.InsertComment(commentInfo)
 	if err != nil {
 		return 0, errors.New("could not insert comment to database. check sender_username and receiver_username are valid usernames.Also check parent_comment_id is valid")
@@ -156,7 +157,7 @@ func (t task) CreateReaction(data []byte) (int, error) {
 
 	err := json.Unmarshal(data, &reactionInfo)
 	if err != nil {
-		fmt.Printf("Error while unmarshalling the reaction . Error : %s", err.Error())
+		log.Printf("Error while unmarshalling the reaction . Error : %s", err.Error())
 		return 0, errors.New("could not add reaction. error while unmarshalling the reaction")
 	}
 
@@ -165,7 +166,7 @@ func (t task) CreateReaction(data []byte) (int, error) {
 		return 0, err
 	}
 
-	//fmt.Printf("reaction is : %+v \n", reactionInfo)
+	//log.Printf("reaction is : %+v \n", reactionInfo)
 	id, err := database.Action.InsertReaction(reactionInfo)
 	if err != nil {
 		return 0, errors.New("could not insert reaction to database. Check if comment_id is valid")

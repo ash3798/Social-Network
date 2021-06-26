@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -60,13 +61,15 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("login successful for user '%s' \n", username)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(response))
 }
 
 //HandleCreateComment handles the request to create comment
 func HandleComment(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(w, r) {
+	username, ok := isAuthorized(w, r)
+	if !ok {
 		return
 	}
 
@@ -78,7 +81,7 @@ func HandleComment(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//log.Println(string(data))
-		id, err := task.Action.CreateComment(data)
+		id, err := task.Action.CreateComment(username, data)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -95,7 +98,6 @@ func HandleComment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		username := r.URL.Query().Get("username")
 		if len(username) <= 0 || len(username) > 50 {
 			http.Error(w, "username is either empty or too big", http.StatusBadRequest)
 			return
@@ -116,7 +118,8 @@ func HandleComment(w http.ResponseWriter, r *http.Request) {
 
 //HandleCreateReaction handles the request to create reaction on comment
 func HandleCreateReaction(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(w, r) {
+	_, ok := isAuthorized(w, r)
+	if !ok {
 		return
 	}
 
@@ -143,7 +146,8 @@ func HandleCreateReaction(w http.ResponseWriter, r *http.Request) {
 
 //HandleGetWall handles the request to get wall
 func HandleGetWall(w http.ResponseWriter, r *http.Request) {
-	if !isAuthorized(w, r) {
+	username, ok := isAuthorized(w, r)
+	if !ok {
 		return
 	}
 
@@ -152,13 +156,12 @@ func HandleGetWall(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//log.Println(string(data))
-	username := r.URL.Query().Get("username")
 	if len(username) <= 0 || len(username) > 50 {
 		http.Error(w, "username is either empty or too big", http.StatusBadRequest)
 		return
 	}
 
-	fmt.Printf("Generating wall for user %s", username)
+	log.Printf("Generating wall for user %s \n", username)
 	wall, err := task.Action.GenerateWall(username)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -170,23 +173,25 @@ func HandleGetWall(w http.ResponseWriter, r *http.Request) {
 }
 
 //isAuthorized check if user is authorized or not
-func isAuthorized(w http.ResponseWriter, r *http.Request) bool {
+func isAuthorized(w http.ResponseWriter, r *http.Request) (string, bool) {
 	if !config.Manager.AuthEnabled {
 		//only for unit testing.  AuthEnable should always be true
-		return true
+		log.Println("Auth is disabled.Continuing without verifying")
+		return "", true
 	}
 
 	authToken := r.Header.Get("Authorization")
 	if authToken == "" {
 		http.Error(w, "No authorization token provided", http.StatusUnauthorized)
-		return false
+		return "", false
 	}
 
-	err := auth.ValidateToken(authToken)
+	claims, err := auth.ValidateToken(authToken)
 	if err != nil {
 		http.Error(w, "Invalid authorization token provided", http.StatusUnauthorized)
-		return false
+		return "", false
 	}
 
-	return true
+	username := claims["username"].(string)
+	return username, true
 }

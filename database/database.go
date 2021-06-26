@@ -73,10 +73,10 @@ func (d database) PrepareDatabase() error {
 
 	_, err := d.db.Exec(userSql)
 	if err != nil {
-		fmt.Printf("Error while creating %s table in database.Error : %s", usersTableName, err.Error())
+		log.Printf("Error while creating %s table in database.Error : %s", usersTableName, err.Error())
 		return err
 	} else {
-		fmt.Printf("%s table created successfully in DB\n", usersTableName)
+		log.Printf("%s table created successfully in DB\n", usersTableName)
 	}
 
 	//create comments table
@@ -97,10 +97,10 @@ func (d database) PrepareDatabase() error {
 
 	_, err = d.db.Exec(userSql)
 	if err != nil {
-		fmt.Printf("Error while creating %s table in database.Error : %s", commentTableName, err.Error())
+		log.Printf("Error while creating %s table in database.Error : %s", commentTableName, err.Error())
 		return err
 	} else {
-		fmt.Printf("%s table created successfully in DB\n", commentTableName)
+		log.Printf("%s table created successfully in DB\n", commentTableName)
 	}
 
 	//create reactions Table
@@ -116,10 +116,10 @@ func (d database) PrepareDatabase() error {
 
 	_, err = d.db.Exec(userSql)
 	if err != nil {
-		fmt.Printf("Error while creating %s table in database.Error : %s", reactionsTableName, err.Error())
+		log.Printf("Error while creating %s table in database.Error : %s", reactionsTableName, err.Error())
 		return err
 	} else {
-		fmt.Printf("%s table created successfully in DB\n", reactionsTableName)
+		log.Printf("%s table created successfully in DB\n", reactionsTableName)
 	}
 
 	return nil
