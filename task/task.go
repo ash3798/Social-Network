@@ -100,7 +100,7 @@ func (t task) CreateComment(username string, data []byte) (int, error) {
 	//log.Printf("comment is : %+v \n", commentInfo)
 	id, err := database.Action.InsertComment(commentInfo)
 	if err != nil {
-		return 0, errors.New("could not insert comment to database. check sender_username and receiver_username are valid usernames.Also check parent_comment_id is valid")
+		return 0, errors.New("could not insert comment to database. check receiver_username is valid username.Also check if parent_comment_id is valid if you are doing subcomment")
 	}
 	return id, nil
 }
