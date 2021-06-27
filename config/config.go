@@ -6,6 +6,7 @@ import (
 	"github.com/kelseyhightower/envconfig"
 )
 
+//Config holds all the variables initialized by environment variables
 type Config struct {
 	AppPort            int    `split_words:"true" default:"9999"`
 	Hostname           string `split_words:"true" default:"localhost"`
@@ -25,6 +26,7 @@ const (
 )
 
 var (
+	//Manager will be used to access all the variables initialized by environment variable
 	Manager *Config
 	//list of allowed reactions
 	AllowedReactions = []string{like, dislike, plusOne}
@@ -32,6 +34,7 @@ var (
 	ReactionMap map[string]int
 )
 
+//InitEnv loads all the environment variables
 func InitEnv() {
 	Manager = &Config{}
 

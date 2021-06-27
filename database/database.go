@@ -36,9 +36,11 @@ type database struct {
 }
 
 var (
+	//Action is used to access all the database functions
 	Action DATABASE = database{}
 )
 
+//InitDatabase initializes the database using the config values set by user in environment variables
 func InitDatabase() error {
 	database := database{}
 	DB_DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", config.Manager.DatabaseUsername, config.Manager.DatabasePassword, config.Manager.Hostname, config.Manager.DatabasePort, config.Manager.DatabaseName)
@@ -65,10 +67,12 @@ func InitDatabase() error {
 	return nil
 }
 
+//CloseDBConnection closes the database connection
 func (d database) CloseDBConnection() {
 	d.db.Close()
 }
 
+//PrepareDatabase prepares the database at startup and create all the required tables
 func (d database) PrepareDatabase() error {
 	userSql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s (id serial PRIMARY KEY,username VARCHAR(50) UNIQUE NOT NULL,name VARCHAR(50) NOT NULL,password VARCHAR(50) NOT NULL);", usersTableName)
 

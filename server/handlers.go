@@ -116,6 +116,7 @@ func HandleComment(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Wrong method used. Please use POST or DELETE method", http.StatusMethodNotAllowed)
 }
 
+//HandleCreateSubcomment handles subcomment creation request
 func HandleCreateSubcomment(w http.ResponseWriter, r *http.Request) {
 	username, ok := isAuthorized(w, r)
 	if !ok {

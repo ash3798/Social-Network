@@ -24,6 +24,7 @@ type TASK interface {
 type task struct{}
 
 var (
+	//Action variable is used to access all the function of TASK interface
 	Action TASK = task{}
 )
 
@@ -106,6 +107,7 @@ func (t task) CreateComment(username string, data []byte) (int, error) {
 	return id, nil
 }
 
+//CreateSubcomment creates the subcomment using the comment info given
 func (t task) CreateSubcomment(username string, data []byte) (int, error) {
 	commentInfo := structures.CommentInfo{}
 

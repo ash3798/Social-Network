@@ -9,6 +9,7 @@ import (
 	"github.com/ash3798/Social-Network/structures"
 )
 
+//CheckLoginCreds checks if the login credential are valid
 func CheckLoginCreds(data []byte) (string, error) {
 	loginCred := structures.LoginCred{}
 

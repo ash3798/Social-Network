@@ -11,10 +11,12 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
+//LoginResponse is response user will get on successful login
 type LoginResponse struct {
 	Token string `json:"token"`
 }
 
+//CreateToken will create jwt token with username in it
 func CreateToken(userName string) ([]byte, error) {
 	atClaims := jwt.MapClaims{}
 	atClaims["username"] = userName
@@ -35,6 +37,7 @@ func CreateToken(userName string) ([]byte, error) {
 	return res, nil
 }
 
+//extractToken will extract token string from Authorization header
 func extractToken(authToken string) (string, error) {
 	extractedToken := strings.Split(authToken, "Bearer ")
 	if len(extractedToken) == 2 {
@@ -44,6 +47,7 @@ func extractToken(authToken string) (string, error) {
 	return "", errors.New("incorrect format of Authorization Token")
 }
 
+//ValidateToken will check if authorization token is valid or not
 func ValidateToken(authToken string) (jwt.MapClaims, error) {
 	signedToken, err := extractToken(authToken)
 	if err != nil {

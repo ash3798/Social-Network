@@ -9,6 +9,7 @@ import (
 	"github.com/ash3798/Social-Network/structures"
 )
 
+//InsertUser inserts the user into database
 func (d database) InsertUser(userInfo structures.User) (int, error) {
 	userSql := fmt.Sprintf(`insert into %s(username , name ,password) 
 	values ($1 , $2 , $3) returning id`, usersTableName)
@@ -24,6 +25,7 @@ func (d database) InsertUser(userInfo structures.User) (int, error) {
 	return lastInsertId, nil
 }
 
+//InsertComment insert comment into database based on info given by user
 func (d database) InsertComment(commentInfo structures.CommentInfo) (int, error) {
 	userSql := ""
 
@@ -48,6 +50,7 @@ func (d database) InsertComment(commentInfo structures.CommentInfo) (int, error)
 	return lastInsertId, nil
 }
 
+//InsertReaction inserts the reaction into database based on the info given
 func (d database) InsertReaction(reactionInfo structures.ReactionInfo) (int, error) {
 	userSql := fmt.Sprintf(`insert into %s (comment_id , reaction)
 	values($1 , $2) returning id`, reactionsTableName)
@@ -63,6 +66,7 @@ func (d database) InsertReaction(reactionInfo structures.ReactionInfo) (int, err
 	return lastInsertId, nil
 }
 
+//DeleteComment deletes the comment from database for given comment id and username
 func (d database) DeleteComment(comment_id int, username string) error {
 	userSql := fmt.Sprintf(`delete from %s where id = $1 and sender_username = $2`, commentTableName)
 

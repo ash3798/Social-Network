@@ -8,6 +8,7 @@ import (
 	"github.com/ash3798/Social-Network/config"
 )
 
+//StartServer starts the http server for listening to API requests
 func StartServer() {
 	api := NewAPI()
 

@@ -7,6 +7,7 @@ const (
 	get  = "GET"
 )
 
+//endpoint struct have all endpoint related information
 type endpoint struct {
 	method  string
 	path    string
@@ -17,20 +18,24 @@ type API interface {
 	apiEndpoint() []endpoint
 }
 
+//Api struct have all the endpoints in it
 type Api struct {
 	endpoints []endpoint
 }
 
+//apiEndpoint returnes all endpoints of API
 func (a *Api) apiEndpoint() []endpoint {
 	return a.endpoints
 }
 
+//NewAPI returns a new Api
 func NewAPI() *Api {
 	api := &Api{}
 	api.endpoints = getEndpoints()
 	return api
 }
 
+//getEndpoints gives all the endpoints for application
 func getEndpoints() []endpoint {
 	return []endpoint{
 		{

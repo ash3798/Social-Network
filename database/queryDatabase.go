@@ -9,6 +9,7 @@ import (
 	"github.com/ash3798/Social-Network/structures"
 )
 
+//ValidateLoginCreds checks if login credentials are there in database or not
 func (d database) ValidateLoginCreds(loginCreds structures.LoginCred) error {
 	userSql := fmt.Sprintf(`select username from %s where username=$1 and password=$2`, usersTableName)
 
@@ -26,6 +27,7 @@ func (d database) ValidateLoginCreds(loginCreds structures.LoginCred) error {
 	return nil
 }
 
+//GetComments will get the comments from database received by user
 func (d database) GetComments(username string) ([]structures.WallUnit, error) {
 	wall := []structures.WallUnit{}
 	userSql := fmt.Sprintf(`select id ,comment_text , sender_username , comment_time from %s where receiver_username = $1 ;`, commentTableName)
@@ -58,6 +60,7 @@ func (d database) GetComments(username string) ([]structures.WallUnit, error) {
 	return wall, nil
 }
 
+//GetReactionCount gives the count of the reactions on the comment with given commentID
 func (d database) GetReactionCount(commentID int) (map[string]int, error) {
 	m := make(map[string]int)
 
@@ -92,6 +95,7 @@ func (d database) GetReactionCount(commentID int) (map[string]int, error) {
 	return m, nil
 }
 
+//GetCommentByID gets comment from database which matches the given id
 func (d database) GetCommentByID(commentID int) (string, error) {
 	userSql := fmt.Sprintf(`select receiver_username from %s where id = $1`, commentTableName)
 
