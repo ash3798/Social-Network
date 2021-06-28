@@ -85,7 +85,10 @@ docker logs -f Social-Network-app
 * TOKEN_EXPIRE_TIME_SEC : Used to set time in seconds after which token will expire. Default : "900"seconds
 
 ## USAGE TIPS :
-
+**Note : Server is HTTP. So your requests should use http protocol.**
+```shell
+http:://<hostname>:<port>/<path>
+```
 ### API available 
 1) **Create User**
 ```json
